@@ -7,6 +7,7 @@ const nextConfig = {
         hostname: "firebasestorage.googleapis.com",
       },
     ],
+    qualities: [75, 100],
   },
 };
 
