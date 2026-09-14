@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1,
+  h2,
+  h3 {
+    @apply font-script;
+  }
+}
+
+@layer components {
+  .notebook-card {
+    @apply bg-paper border border-cocoa/20 rounded-sm shadow-[3px_3px_0_0_rgba(107,66,38,0.15)];
+  }
+
+  .stamp {
+    @apply inline-block rotate-[-3deg] border-2 border-stamp text-stamp px-2 py-0.5 text-sm font-bold rounded;
+  }
+
+  .btn-primary {
+    @apply bg-cocoa text-paper px-4 py-2 rounded-sm hover:bg-rust transition-colors;
+  }
+
+  .btn-secondary {
+    @apply border border-cocoa text-cocoa px-4 py-2 rounded-sm hover:bg-cocoa/10 transition-colors;
+  }
+}
+
+@media print {
+  nav,
+  footer,
+  .no-print {
+    display: none !important;
+  }
+}

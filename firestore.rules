@@ -1,0 +1,34 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAllowedEmail() {
+      return isSignedIn() &&
+        exists(/databases/$(database)/documents/allowed_emails/$(request.auth.token.email));
+    }
+
+    // Liste blanche : gérée uniquement depuis la console Firebase / un script admin.
+    // Personne ne peut la lire ou l'écrire depuis le client.
+    match /allowed_emails/{email} {
+      allow read, write: if false;
+    }
+
+    // Recettes : lecture réservée aux emails autorisés, écriture idem
+    // (pas de distinction contributeur/lecteur au lancement, cf. cahier des charges §7).
+    match /recipes/{recipeId} {
+      allow read: if isAllowedEmail();
+      allow create, update, delete: if isAllowedEmail();
+    }
+
+    // Auteurs : lecture réservée aux emails autorisés, écriture idem.
+    match /authors/{authorId} {
+      allow read: if isAllowedEmail();
+      allow write: if isAllowedEmail();
+    }
+  }
+}
