@@ -11,7 +11,7 @@ export function PrintableRecipe({ recipe }: { recipe: Recipe }) {
       <div className="flex justify-between items-start no-print">
         <h1 className="text-4xl">{recipe.title}</h1>
         <button onClick={() => window.print()} className="btn-secondary">
-          🖨️ Imprimer la fiche
+          Imprimer la fiche
         </button>
       </div>
       <h1 className="text-4xl hidden print:block">{recipe.title}</h1>
@@ -22,11 +22,11 @@ export function PrintableRecipe({ recipe }: { recipe: Recipe }) {
       </p>
 
       <div className="flex flex-wrap gap-4 mt-4 text-sm">
-        <span>⏱️ Préparation : {recipe.prepMinutes} min</span>
-        <span>🔥 Cuisson : {recipe.cookMinutes} min</span>
-        {recipe.restMinutes > 0 && <span>💤 Repos : {recipe.restMinutes} min</span>}
-        <span>📊 Difficulté : {difficulty}</span>
-        <span>🍽️ {recipe.servings} portions</span>
+        <span>Préparation : {recipe.prepMinutes} min</span>
+        <span>Cuisson : {recipe.cookMinutes} min</span>
+        {recipe.restMinutes > 0 && <span>Repos : {recipe.restMinutes} min</span>}
+        <span>Difficulté : {difficulty}</span>
+        <span>{recipe.servings} portions</span>
       </div>
 
       {recipe.tags.length > 0 && (

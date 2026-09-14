@@ -220,7 +220,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
               }
               className="text-stamp"
             >
-              ✕
+              ×
             </button>
           </div>
         ))}
@@ -255,7 +255,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
               onClick={() => setSteps(steps.filter((_, i) => i !== idx))}
               className="text-stamp"
             >
-              ✕
+              ×
             </button>
           </div>
         ))}

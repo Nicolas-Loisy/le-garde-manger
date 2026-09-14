@@ -53,7 +53,7 @@ export default function HomePage() {
 
       {recetteDuJour && (
         <section>
-          <h2 className="text-3xl mb-3">🍯 Recette du jour</h2>
+          <h2 className="text-3xl mb-3">Recette du jour</h2>
           <div className="max-w-sm">
             <RecipeCard recipe={recetteDuJour} />
           </div>
