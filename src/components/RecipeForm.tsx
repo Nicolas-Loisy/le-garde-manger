@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createRecipe, updateRecipe } from "@/lib/recipes";
-import { uploadRecipePhoto } from "@/lib/storage";
 import {
   CATEGORIES,
   DIFFICULTIES,
@@ -34,7 +33,6 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
   const [servings, setServings] = useState(existing?.servings ?? 4);
   const [tags, setTags] = useState(existing?.tags.join(", ") ?? "");
   const [notes, setNotes] = useState(existing?.notes ?? "");
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -72,11 +70,6 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
         await updateRecipe(id, payload);
       } else {
         id = await createRecipe(payload);
-      }
-
-      if (photoFile) {
-        const url = await uploadRecipePhoto(id, photoFile);
-        await updateRecipe(id, { photoUrls: [...payload.photoUrls, url] });
       }
 
       router.push(`/recipes/${id}`);
@@ -292,15 +285,6 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
           onChange={(e) => setNotes(e.target.value)}
           rows={3}
           className="w-full bg-transparent border-b border-cocoa/30 py-1 focus:outline-none focus:border-rust"
-        />
-      </div>
-
-      <div>
-        <label className="block mb-1">Photo</label>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
         />
       </div>
 
