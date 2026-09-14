@@ -84,7 +84,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="notebook-card p-6 flex flex-col gap-5">
+    <form onSubmit={handleSubmit} className="notebook-card p-4 sm:p-6 flex flex-col gap-5">
       <div>
         <label className="block mb-1">Titre</label>
         <input
@@ -192,7 +192,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
       <div>
         <label className="block mb-1">Ingrédients</label>
         {ingredients.map((ing, idx) => (
-          <div key={idx} className="flex gap-2 mb-2">
+          <div key={idx} className="flex flex-wrap gap-2 mb-2">
             <input
               placeholder="Ingrédient"
               value={ing.name}
@@ -201,7 +201,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
                 next[idx] = { ...next[idx], name: e.target.value };
                 setIngredients(next);
               }}
-              className="flex-1 bg-transparent border-b border-cocoa/30 py-1 focus:outline-none focus:border-rust"
+              className="w-full sm:flex-1 bg-transparent border-b border-cocoa/30 py-1 focus:outline-none focus:border-rust"
             />
             <input
               type="number"

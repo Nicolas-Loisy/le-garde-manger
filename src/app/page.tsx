@@ -61,8 +61,8 @@ export default function HomePage() {
       )}
 
       <section>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-3xl">Dernières recettes ajoutées</h2>
+        <div className="flex items-center flex-wrap justify-between gap-2 mb-3">
+          <h2 className="text-2xl sm:text-3xl">Dernières recettes ajoutées</h2>
           <Link href="/recipes" className="text-rust hover:underline">
             Voir tout →
           </Link>

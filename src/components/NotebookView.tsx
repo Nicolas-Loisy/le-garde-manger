@@ -35,7 +35,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
     return (
       <div className="spiral-notebook mx-auto max-w-2xl" style={{ perspective: "1500px" }}>
         <SpiralRings />
-        <div className="ruled-page p-10 pl-14 text-center">
+        <div className="ruled-page p-6 pl-10 sm:p-10 sm:pl-14 text-center">
           <p className="text-cocoa/70">
             Le carnet est encore vide. Ajoute une première recette pour la voir ici.
           </p>
@@ -57,13 +57,13 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
         <SpiralRings />
         <div
           key={recipe.id}
-          className={`ruled-page p-8 pl-14 ${
+          className={`ruled-page p-5 pl-10 sm:p-8 sm:pl-14 ${
             flip === "next" ? "page-flip-next" : flip === "prev" ? "page-flip-prev" : ""
           }`}
         >
           <Link
             href={`/recipes/${recipe.id}`}
-            className="text-4xl block mb-1 hover:text-rust"
+            className="text-2xl sm:text-4xl block mb-1 hover:text-rust break-words"
           >
             {recipe.title}
           </Link>
@@ -96,11 +96,11 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center flex-wrap justify-center gap-3 sm:gap-4">
         <button
           onClick={() => goTo(index - 1, "prev")}
           disabled={index === 0 || !!flip}
-          className="btn-secondary disabled:opacity-30 disabled:cursor-not-allowed"
+          className="btn-secondary text-sm sm:text-base disabled:opacity-30 disabled:cursor-not-allowed"
         >
           ← Page précédente
         </button>
@@ -110,7 +110,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
         <button
           onClick={() => goTo(index + 1, "next")}
           disabled={index === total - 1 || !!flip}
-          className="btn-secondary disabled:opacity-30 disabled:cursor-not-allowed"
+          className="btn-secondary text-sm sm:text-base disabled:opacity-30 disabled:cursor-not-allowed"
         >
           Page suivante →
         </button>

@@ -7,10 +7,10 @@ export function PrintableRecipe({ recipe }: { recipe: Recipe }) {
   const difficulty = DIFFICULTIES.find((d) => d.value === recipe.difficulty)?.label;
 
   return (
-    <article className="notebook-card p-6">
-      <div className="flex justify-between items-start no-print">
-        <h1 className="text-4xl">{recipe.title}</h1>
-        <button onClick={() => window.print()} className="btn-secondary">
+    <article className="notebook-card p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 no-print">
+        <h1 className="text-3xl sm:text-4xl break-words">{recipe.title}</h1>
+        <button onClick={() => window.print()} className="btn-secondary self-start">
           Imprimer la fiche
         </button>
       </div>

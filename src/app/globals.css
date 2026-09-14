@@ -8,6 +8,12 @@
   h3 {
     @apply font-script;
   }
+
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
 }
 
 @layer components {
@@ -48,6 +54,13 @@
   .spiral-rings img {
     width: 100%;
     height: auto;
+  }
+
+  @media (max-width: 480px) {
+    .spiral-rings {
+      width: 1.85rem;
+      right: calc(100% - 1rem);
+    }
   }
 
   .ruled-page {
