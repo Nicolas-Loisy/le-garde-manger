@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AuthGuard } from "@/components/AuthGuard";
 import { RecipeFilters } from "@/components/RecipeFilters";
 import { listRecipes } from "@/lib/recipes";
@@ -23,7 +24,12 @@ function RecipesListContent() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl">Toutes les recettes</h1>
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <h1 className="text-4xl">Toutes les recettes</h1>
+        <Link href="/recipes/carnet" className="btn-secondary">
+          Vue carnet
+        </Link>
+      </div>
       {loading ? (
         <p className="text-cocoa/70">Chargement...</p>
       ) : (
