@@ -2,8 +2,21 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import type { Recipe } from "@/types/recipe";
 import { CATEGORIES, DIFFICULTIES } from "@/types/recipe";
+
+const RING_COUNT = 12;
+
+function SpiralRings() {
+  return (
+    <div className="spiral-rings" aria-hidden="true">
+      {Array.from({ length: RING_COUNT }).map((_, i) => (
+        <Image key={i} src="/spiral-ring.png" alt="" width={64} height={20} />
+      ))}
+    </div>
+  );
+}
 
 export function NotebookView({ recipes }: { recipes: Recipe[] }) {
   const [index, setIndex] = useState(0);
@@ -21,7 +34,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
   if (total === 0) {
     return (
       <div className="spiral-notebook mx-auto max-w-2xl" style={{ perspective: "1500px" }}>
-        <div className="spiral-rings" aria-hidden="true" />
+        <SpiralRings />
         <div className="ruled-page p-10 pl-14 text-center">
           <p className="text-cocoa/70">
             Le carnet est encore vide. Ajoute une première recette pour la voir ici.
@@ -41,7 +54,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
         className="spiral-notebook mx-auto w-full max-w-2xl"
         style={{ perspective: "1500px" }}
       >
-        <div className="spiral-rings" aria-hidden="true" />
+        <SpiralRings />
         <div
           key={recipe.id}
           className={`ruled-page p-8 pl-14 ${
