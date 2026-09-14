@@ -8,13 +8,38 @@ import {
   orderBy,
   query,
   serverTimestamp,
+  Timestamp,
   updateDoc,
   where,
+  type DocumentData,
+  type QueryDocumentSnapshot,
 } from "firebase/firestore";
 import { db } from "./firebase";
 import type { Category, Recipe, RecipeInput } from "@/types/recipe";
 
 const RECIPES_COLLECTION = "recipes";
+
+/**
+ * createdAt/updatedAt sont écrits via serverTimestamp() (Timestamp Firestore),
+ * mais le type Recipe les déclare en string : on normalise ici à la lecture,
+ * quel que soit le format réellement stocké (Timestamp, Date ou déjà string).
+ */
+function toIsoString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value instanceof Timestamp) return value.toDate().toISOString();
+  if (value instanceof Date) return value.toISOString();
+  return new Date().toISOString();
+}
+
+function toRecipe(snap: QueryDocumentSnapshot<DocumentData>): Recipe {
+  const data = snap.data();
+  return {
+    ...data,
+    id: snap.id,
+    createdAt: toIsoString(data.createdAt),
+    updatedAt: toIsoString(data.updatedAt),
+  } as Recipe;
+}
 
 export async function listRecipes(): Promise<Recipe[]> {
   const q = query(
@@ -22,7 +47,7 @@ export async function listRecipes(): Promise<Recipe[]> {
     orderBy("createdAt", "desc")
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as object) }) as Recipe);
+  return snap.docs.map(toRecipe);
 }
 
 export async function listRecipesByCategory(
@@ -34,7 +59,7 @@ export async function listRecipesByCategory(
     orderBy("createdAt", "desc")
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as object) }) as Recipe);
+  return snap.docs.map(toRecipe);
 }
 
 export async function listRecipesByAuthor(authorId: string): Promise<Recipe[]> {
@@ -44,13 +69,13 @@ export async function listRecipesByAuthor(authorId: string): Promise<Recipe[]> {
     orderBy("createdAt", "desc")
   );
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as object) }) as Recipe);
+  return snap.docs.map(toRecipe);
 }
 
 export async function getRecipe(id: string): Promise<Recipe | null> {
   const snap = await getDoc(doc(db, RECIPES_COLLECTION, id));
   if (!snap.exists()) return null;
-  return { id: snap.id, ...(snap.data() as object) } as Recipe;
+  return toRecipe(snap);
 }
 
 export async function createRecipe(input: RecipeInput): Promise<string> {
