@@ -22,8 +22,8 @@ export function RecipeCard({ recipe }: { recipe: Recipe }) {
           />
         </div>
       ) : (
-        <div className="w-full h-40 rounded-sm bg-paper-dark flex items-center justify-center text-cocoa/40 text-sm">
-          Pas de photo
+        <div className="w-full h-40 rounded-sm bg-paper-dark flex items-center justify-center">
+          <Image src="/logo.png" alt="" width={64} height={64} className="opacity-60" />
         </div>
       )}
       <h3 className="text-2xl">{recipe.title}</h3>
