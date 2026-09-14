@@ -9,13 +9,18 @@ service cloud.firestore {
 
     function isAllowedEmail() {
       return isSignedIn() &&
-        exists(/databases/$(database)/documents/allowed_emails/$(request.auth.token.email));
+        exists(/databases/$(database)/documents/allowed_emails/$(request.auth.token.email.lower()));
     }
 
-    // Liste blanche : gérée uniquement depuis la console Firebase / un script admin.
-    // Personne ne peut la lire ou l'écrire depuis le client.
+    // Liste blanche : gérée uniquement depuis la console Firebase / un script admin
+    // (écriture toujours interdite côté client). Un utilisateur connecté peut lire
+    // uniquement son propre document, pour que l'app sache si son email est autorisé
+    // — sans pouvoir énumérer ni lire les emails des autres. Les IDs de document sont
+    // toujours en minuscules (voir src/lib/auth.ts et scripts/manage-whitelist.mjs),
+    // donc on compare le token en minuscules pour ignorer la casse de connexion.
     match /allowed_emails/{email} {
-      allow read, write: if false;
+      allow read: if isSignedIn() && request.auth.token.email.lower() == email;
+      allow write: if false;
     }
 
     // Recettes : lecture réservée aux emails autorisés, écriture idem

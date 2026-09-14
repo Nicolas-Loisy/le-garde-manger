@@ -33,7 +33,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       if (firebaseUser?.email) {
-        setIsAllowed(await isEmailAllowed(firebaseUser.email));
+        try {
+          setIsAllowed(await isEmailAllowed(firebaseUser.email));
+        } catch {
+          // Une erreur ici (règles Firestore, réseau...) ne doit jamais
+          // bloquer l'app indéfiniment sur l'écran de chargement.
+          setIsAllowed(false);
+        }
       } else {
         setIsAllowed(false);
       }
