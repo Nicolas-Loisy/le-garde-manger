@@ -56,7 +56,6 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
       >
         <SpiralRings />
         <div
-          key={recipe.id}
           className={`ruled-page p-5 pl-10 sm:p-8 sm:pl-14 ${
             flip === "next" ? "page-flip-next" : flip === "prev" ? "page-flip-prev" : ""
           }`}
