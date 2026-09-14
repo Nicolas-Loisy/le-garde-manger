@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/context/AuthContext";
 import { signOut } from "@/lib/auth";
 
@@ -10,7 +11,8 @@ export function Navbar() {
   return (
     <nav className="border-b-2 border-cocoa/20 bg-paper-dark/60">
       <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between flex-wrap gap-3">
-        <Link href="/" className="text-3xl font-script text-cocoa">
+        <Link href="/" className="flex items-center gap-2 text-3xl font-script text-cocoa">
+          <Image src="/logo.png" alt="" width={40} height={40} className="rounded-full" />
           Le Garde-Manger
         </Link>
         <div className="flex items-center gap-4 text-lg">
