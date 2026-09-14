@@ -18,6 +18,9 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
   const { user } = useAuth();
 
   const [title, setTitle] = useState(existing?.title ?? "");
+  const [authorName, setAuthorName] = useState(
+    existing?.authorName ?? user?.displayName ?? user?.email ?? ""
+  );
   const [category, setCategory] = useState<Category>(existing?.category ?? "plat");
   const [cuisineType, setCuisineType] = useState(existing?.cuisineType ?? "");
   const [ingredients, setIngredients] = useState<Ingredient[]>(
@@ -47,7 +50,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
         title,
         photoUrls: existing?.photoUrls ?? [],
         authorId: user.uid,
-        authorName: user.displayName || user.email || "Anonyme",
+        authorName: authorName.trim() || user.displayName || user.email || "Anonyme",
         category,
         cuisineType: cuisineType || undefined,
         ingredients: ingredients.filter((i) => i.name.trim() !== ""),
@@ -88,6 +91,17 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
+          className="w-full bg-transparent border-b border-cocoa/30 py-1 focus:outline-none focus:border-rust"
+        />
+      </div>
+
+      <div>
+        <label className="block mb-1">Auteur</label>
+        <input
+          required
+          value={authorName}
+          onChange={(e) => setAuthorName(e.target.value)}
+          placeholder="Qui a transmis cette recette ?"
           className="w-full bg-transparent border-b border-cocoa/30 py-1 focus:outline-none focus:border-rust"
         />
       </div>
