@@ -33,25 +33,25 @@
 
   .spiral-rings {
     position: absolute;
-    left: -0.65rem;
-    top: 1.75rem;
-    bottom: 1.75rem;
-    width: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
+    left: -0.95rem;
+    top: 0;
+    bottom: 0;
+    width: 2rem;
     z-index: 10;
     pointer-events: none;
-  }
-
-  .spiral-ring {
-    display: block;
-    width: 1.5rem;
-    height: 1.5rem;
-    border-radius: 9999px;
-    border: 3px solid rgba(107, 66, 38, 0.55);
-    background: #f0e4cc;
-    box-shadow: inset 0 0 0 3px #faf3e6;
+    background-image: radial-gradient(
+      circle at 50% 50%,
+      transparent 6px,
+      #5a5a5a 6px,
+      #dcdcdc 8px,
+      #8f8f8f 9px,
+      #4a4a4a 10.5px,
+      transparent 11px
+    );
+    background-size: 100% 30px;
+    background-repeat: repeat-y;
+    background-position: 0 18px;
+    filter: drop-shadow(1px 2px 1px rgba(59, 47, 47, 0.35));
   }
 
   .ruled-page {

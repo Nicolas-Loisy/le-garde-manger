@@ -5,18 +5,6 @@ import Link from "next/link";
 import type { Recipe } from "@/types/recipe";
 import { CATEGORIES, DIFFICULTIES } from "@/types/recipe";
 
-const RING_COUNT = 16;
-
-function SpiralRings() {
-  return (
-    <div className="spiral-rings" aria-hidden="true">
-      {Array.from({ length: RING_COUNT }).map((_, i) => (
-        <span key={i} className="spiral-ring" />
-      ))}
-    </div>
-  );
-}
-
 export function NotebookView({ recipes }: { recipes: Recipe[] }) {
   const [index, setIndex] = useState(0);
   const [flip, setFlip] = useState<"next" | "prev" | null>(null);
@@ -33,7 +21,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
   if (total === 0) {
     return (
       <div className="spiral-notebook mx-auto max-w-2xl" style={{ perspective: "1500px" }}>
-        <SpiralRings />
+        <div className="spiral-rings" aria-hidden="true" />
         <div className="ruled-page p-10 pl-14 text-center">
           <p className="text-cocoa/70">
             Le carnet est encore vide. Ajoute une première recette pour la voir ici.
@@ -53,7 +41,7 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
         className="spiral-notebook mx-auto w-full max-w-2xl"
         style={{ perspective: "1500px" }}
       >
-        <SpiralRings />
+        <div className="spiral-rings" aria-hidden="true" />
         <div
           key={recipe.id}
           className={`ruled-page p-8 pl-14 ${
@@ -73,24 +61,20 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
 
           <h3 className="text-xl mb-1">Ingrédients</h3>
           <ul className="list-disc list-inside mb-4 text-sm">
-            {recipe.ingredients.slice(0, 8).map((ing, i) => (
+            {recipe.ingredients.map((ing, i) => (
               <li key={i}>
                 {ing.quantity ? `${ing.quantity} ` : ""}
                 {ing.unit ? `${ing.unit} ` : ""}
                 {ing.name}
               </li>
             ))}
-            {recipe.ingredients.length > 8 && <li>...</li>}
           </ul>
 
           <h3 className="text-xl mb-1">Préparation</h3>
           <ol className="list-decimal list-inside text-sm space-y-1">
-            {recipe.steps.slice(0, 4).map((step, i) => (
-              <li key={i} className="line-clamp-2">
-                {step}
-              </li>
+            {recipe.steps.map((step, i) => (
+              <li key={i}>{step}</li>
             ))}
-            {recipe.steps.length > 4 && <li>...</li>}
           </ol>
 
           <p className="text-right text-cocoa/50 text-sm mt-6">
