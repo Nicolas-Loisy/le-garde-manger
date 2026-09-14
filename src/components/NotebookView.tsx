@@ -12,7 +12,7 @@ function SpiralRings() {
   return (
     <div className="spiral-rings" aria-hidden="true">
       {Array.from({ length: RING_COUNT }).map((_, i) => (
-        <Image key={i} src="/spiral-ring.png" alt="" width={64} height={20} />
+        <Image key={i} src="/spiral-ring.png" alt="" width={44} height={14} />
       ))}
     </div>
   );
