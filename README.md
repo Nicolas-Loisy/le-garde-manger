@@ -64,6 +64,19 @@ Options pour réactiver les photos plus tard :
 
 `storage.rules` reste dans le repo, prête à être déployée le jour où Storage est activé.
 
+## Remplissage automatique par IA
+
+Le formulaire d'ajout de recette propose de coller un texte (recette copiée d'un site, d'un livre...) ou de dicter au micro : [Firebase AI Logic](https://firebase.google.com/docs/ai-logic) (Gemini, backend "Gemini Developer API", gratuit — pas de plan Blaze requis) extrait les champs structurés et préremplit le formulaire.
+
+Cette API est protégée par **App Check**, qui exige un jeton d'attestation valide pour chaque appel (sinon erreur 401). Mise en place, une seule fois :
+
+1. **Activer l'API** : Console Firebase → *Build* → *AI Logic* → *Get started* → choisir **Gemini Developer API** (pas "Vertex AI Gemini API", qui demande Blaze).
+2. **Créer une clé reCAPTCHA v3** (gratuite) sur [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) : type "reCAPTCHA v3", domaines `localhost` et votre domaine de production (ex. `xxx.vercel.app`). Copiez la **clé de site** dans `.env.local` → `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`.
+3. **Enregistrer App Check** : Console Firebase → *App Check* → onglet *Apps* → votre app Web → *Enregistrer* → fournisseur **reCAPTCHA v3** → collez la même clé de site.
+4. **Jeton de débogage (local uniquement)** : lancez `npm run dev`, ouvrez la console du navigateur (F12), copiez la ligne `App Check debug token: xxxx-xxxx-...` qui s'affiche. Console Firebase → *App Check* → *Apps* → votre app Web → menu ⋮ → *Gérer les jetons de débogage* → *Ajouter un jeton de débogage* → collez-le.
+
+Sans `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, App Check n'est pas initialisé et le reste du site fonctionne normalement — seul le remplissage automatique est indisponible.
+
 ## Règles de sécurité
 
 Les règles Firestore (`firestore.rules`) n'autorisent la lecture/écriture des recettes et auteurs qu'aux utilisateurs authentifiés dont l'email figure dans `allowed_emails`. La collection `allowed_emails` elle-même n'est ni lisible ni modifiable depuis le client — uniquement via la console Firebase ou le SDK Admin.
