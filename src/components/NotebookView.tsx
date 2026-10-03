@@ -67,8 +67,11 @@ export function NotebookView({ recipes }: { recipes: Recipe[] }) {
             {recipe.title}
           </Link>
           <p className="text-cocoa/70 text-sm mb-5">
-            Par {recipe.authorName} · {category} · {difficulty} ·{" "}
-            {recipe.prepMinutes + recipe.cookMinutes} min
+            Par{" "}
+            <Link href={`/recipes/author/${recipe.authorId}`} className="hover:text-rust">
+              {recipe.authorName}
+            </Link>{" "}
+            · {category} · {difficulty} · {recipe.prepMinutes + recipe.cookMinutes} min
           </p>
 
           <h3 className="text-xl mb-1">Ingrédients</h3>

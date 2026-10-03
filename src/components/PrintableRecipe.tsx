@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import type { Recipe } from "@/types/recipe";
 import { DIFFICULTIES } from "@/types/recipe";
 
@@ -17,7 +18,14 @@ export function PrintableRecipe({ recipe }: { recipe: Recipe }) {
       <h1 className="text-4xl hidden print:block">{recipe.title}</h1>
 
       <p className="text-cocoa/80 mt-2">
-        Par {recipe.authorName}
+        Par{" "}
+        <Link
+          href={`/recipes/author/${recipe.authorId}`}
+          className="hover:text-rust no-print"
+        >
+          {recipe.authorName}
+        </Link>
+        <span className="hidden print:inline">{recipe.authorName}</span>
         {recipe.cuisineType ? ` · Cuisine ${recipe.cuisineType}` : ""}
       </p>
 
