@@ -1,7 +1,36 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { parseRecipeFromAudio, parseRecipeFromText, type ParsedRecipe } from "@/lib/ai";
+import { parseRecipeFromText, type ParsedRecipe } from "@/lib/ai";
+
+interface SpeechRecognitionResultLike {
+  transcript: string;
+}
+
+interface SpeechRecognitionEventLike {
+  results: ArrayLike<ArrayLike<SpeechRecognitionResultLike>>;
+}
+
+interface MinimalSpeechRecognition {
+  lang: string;
+  interimResults: boolean;
+  maxAlternatives: number;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: (() => void) | null;
+  onend: (() => void) | null;
+}
+
+type SpeechRecognitionConstructor = new () => MinimalSpeechRecognition;
+
+function getSpeechRecognitionCtor(): SpeechRecognitionConstructor | null {
+  const w = window as unknown as {
+    SpeechRecognition?: SpeechRecognitionConstructor;
+    webkitSpeechRecognition?: SpeechRecognitionConstructor;
+  };
+  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
+}
 
 export function RecipeAutofill({
   onParsed,
@@ -10,16 +39,16 @@ export function RecipeAutofill({
 }) {
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [recording, setRecording] = useState(false);
+  const [listening, setListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const chunksRef = useRef<Blob[]>([]);
+  const recognitionRef = useRef<MinimalSpeechRecognition | null>(null);
 
-  async function runParse(task: () => Promise<ParsedRecipe>) {
+  async function handleTextSubmit() {
+    if (!text.trim()) return;
     setLoading(true);
     setError(null);
     try {
-      const parsed = await task();
+      const parsed = await parseRecipeFromText(text);
       onParsed(parsed);
     } catch (err) {
       setError(
@@ -30,38 +59,37 @@ export function RecipeAutofill({
     }
   }
 
-  async function handleTextSubmit() {
-    if (!text.trim()) return;
-    await runParse(() => parseRecipeFromText(text));
-  }
-
-  async function startRecording() {
-    setError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      chunksRef.current = [];
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data);
-      };
-      recorder.onstop = () => {
-        stream.getTracks().forEach((track) => track.stop());
-        const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
-        void runParse(() => parseRecipeFromAudio(blob));
-      };
-      recorder.start();
-      mediaRecorderRef.current = recorder;
-      setRecording(true);
-    } catch {
-      setError(
-        "Impossible d'accéder au micro. Vérifie les autorisations de ton navigateur."
-      );
+  function toggleDictation() {
+    if (listening) {
+      recognitionRef.current?.stop();
+      return;
     }
-  }
 
-  function stopRecording() {
-    mediaRecorderRef.current?.stop();
-    setRecording(false);
+    const SpeechRecognitionCtor = getSpeechRecognitionCtor();
+    if (!SpeechRecognitionCtor) {
+      setError(
+        "La dictée vocale n'est pas disponible sur ce navigateur (essaie Chrome ou Edge)."
+      );
+      return;
+    }
+
+    setError(null);
+    const recognition = new SpeechRecognitionCtor();
+    recognition.lang = "fr-FR";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      setText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+    };
+    recognition.onerror = () => {
+      setError("Erreur pendant la dictée. Réessaie.");
+      setListening(false);
+    };
+    recognition.onend = () => setListening(false);
+    recognitionRef.current = recognition;
+    recognition.start();
+    setListening(true);
   }
 
   return (
@@ -75,29 +103,27 @@ export function RecipeAutofill({
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={5}
-        placeholder="Colle ici le texte d'une recette..."
+        placeholder="Colle ici le texte d'une recette, ou utilise le micro..."
         className="w-full bg-transparent border border-cocoa/30 rounded-sm p-2 focus:outline-none focus:border-rust"
       />
       <div className="flex flex-wrap items-center gap-3">
         <button
           type="button"
           onClick={handleTextSubmit}
-          disabled={loading || recording || !text.trim()}
+          disabled={loading || listening || !text.trim()}
           className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed"
         >
           {loading ? "Analyse en cours..." : "Remplir depuis le texte"}
         </button>
         <button
           type="button"
-          onClick={recording ? stopRecording : startRecording}
+          onClick={toggleDictation}
           disabled={loading}
           className="btn-secondary disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          {recording ? "Arrêter et analyser" : "Dicter la recette"}
+          {listening ? "Arrêter la dictée" : "Dicter la recette"}
         </button>
-        {recording && (
-          <span className="text-stamp text-sm">Enregistrement en cours...</span>
-        )}
+        {listening && <span className="text-stamp text-sm">Écoute en cours...</span>}
       </div>
       {error && <p className="text-stamp text-sm">{error}</p>}
     </div>

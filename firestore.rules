@@ -35,5 +35,12 @@ service cloud.firestore {
       allow read: if isAllowedEmail();
       allow write: if isAllowedEmail();
     }
+
+    // Compteur quotidien du remplissage automatique par IA (un document par
+    // jour, ex. "2026-10-03"). Limite coopérative contre l'emballement des
+    // coûts de l'API Claude, pas une barrière de sécurité stricte.
+    match /ai_usage/{day} {
+      allow read, write: if isAllowedEmail();
+    }
   }
 }

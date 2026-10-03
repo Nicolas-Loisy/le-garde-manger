@@ -66,17 +66,19 @@ Options pour réactiver les photos plus tard :
 
 ## Remplissage automatique par IA
 
-Le formulaire d'ajout de recette propose de coller un texte (recette copiée d'un site, d'un livre...) ou de dicter au micro : [Firebase AI Logic](https://firebase.google.com/docs/ai-logic) (Gemini, backend "Gemini Developer API", gratuit — pas de plan Blaze requis) extrait les champs structurés et préremplit le formulaire.
+Le formulaire d'ajout de recette propose de coller un texte (recette copiée d'un site, d'un livre...) ou de dicter au micro : l'API [Claude](https://console.anthropic.com) extrait les champs structurés et préremplit le formulaire.
 
-Cette API est protégée par **App Check**, qui exige un jeton d'attestation valide pour chaque appel (sinon erreur 401). Mise en place, une seule fois :
+- **Dictée** : reconnaissance vocale native du navigateur (gratuite, fonctionne sur Chrome/Edge — pas Firefox/Safari), qui transcrit dans le champ texte. Le même bouton "Remplir depuis le texte" analyse ensuite ce texte, qu'il soit tapé, collé ou dicté.
+- **Appel à Claude** : se fait uniquement côté serveur, via la route `src/app/api/parse-recipe/route.ts` — la clé API n'est jamais exposée au navigateur.
 
-1. **Activer l'API** : Console Firebase → *Build* → *AI Logic* → *Get started* → choisir **Gemini Developer API** (pas "Vertex AI Gemini API", qui demande Blaze).
-2. **Créer une clé Fraud Defense / reCAPTCHA Enterprise** (gratuite) : Google Cloud Console → *Security* → *Fraud Defense* (anciennement reCAPTCHA Enterprise) → créer une clé type *Score-based* (site web), domaines `localhost` et votre domaine de production (ex. `xxx.vercel.app`). Copiez le **Key ID** dans `.env.local` → `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`.
-   ⚠️ Ce n'est pas la même clé que celle du reCAPTCHA v3 "classique" (`google.com/recaptcha/admin`) — Fraud Defense a son propre tableau de clés, dans le même projet Google Cloud que Firebase.
-3. **Enregistrer App Check** : Console Firebase → *App Check* → onglet *Apps* → votre app Web → *Enregistrer* → fournisseur **reCAPTCHA Enterprise** → collez le même Key ID.
-4. **Jeton de débogage (local uniquement)** : lancez `npm run dev`, ouvrez la console du navigateur (F12), copiez la ligne `App Check debug token: xxxx-xxxx-...` qui s'affiche. Console Firebase → *App Check* → *Apps* → votre app Web → menu ⋮ → *Gérer les jetons de débogage* → *Ajouter un jeton de débogage* → collez-le.
+Mise en place :
 
-Sans `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, App Check n'est pas initialisé et le reste du site fonctionne normalement — seul le remplissage automatique est indisponible.
+1. Créez une clé sur [console.anthropic.com/settings/keys](https://console.anthropic.com/settings/keys) (nécessite un compte Anthropic avec un moyen de paiement renseigné — contrairement à Firebase, cette API n'a pas d'offre gratuite).
+2. Collez-la dans `.env.local` → `ANTHROPIC_API_KEY` (**sans** préfixe `NEXT_PUBLIC_`, pour qu'elle reste côté serveur).
+
+Sans `ANTHROPIC_API_KEY`, le reste du site fonctionne normalement — seul le remplissage automatique renvoie une erreur.
+
+**Limite quotidienne :** pour éviter un emballement de la facture, chaque remplissage automatique est compté dans la collection Firestore `ai_usage` (un document par jour). Au-delà de 20 par jour (`DAILY_LIMIT` dans `src/lib/ai.ts`), la fonctionnalité se bloque jusqu'au lendemain. C'est une limite coopérative (basée sur le SDK client Firestore, pas une barrière infranchissable) adaptée à un usage familial de confiance, pas à un rempart anti-abus strict.
 
 ## Règles de sécurité
 
@@ -91,7 +93,7 @@ firebase deploy --only firestore:rules
 ## Déploiement (Vercel)
 
 1. Connecter le dépôt GitHub à un nouveau projet Vercel.
-2. Renseigner les mêmes variables `NEXT_PUBLIC_FIREBASE_*` (et `NEXT_PUBLIC_APP_URL` avec l'URL de production) dans les variables d'environnement du projet Vercel.
+2. Renseigner les mêmes variables `NEXT_PUBLIC_FIREBASE_*` (et `NEXT_PUBLIC_APP_URL` avec l'URL de production) ainsi que `ANTHROPIC_API_KEY` dans les variables d'environnement du projet Vercel.
 3. Ajouter le domaine `xxx.vercel.app` dans les domaines autorisés de Firebase Authentication.
 
 ## Structure du projet
@@ -99,9 +101,10 @@ firebase deploy --only firestore:rules
 ```
 src/
   app/            routes Next.js (accueil, connexion, recettes, catégories, auteurs, à propos)
+                  + api/parse-recipe (route serveur qui appelle Claude)
   components/     composants réutilisables (carte recette, formulaire, filtres, garde d'accès...)
   context/        contexte React d'authentification
-  lib/            accès Firebase (auth, Firestore)
+  lib/            accès Firebase (auth, Firestore) et IA (remplissage automatique)
   types/          types TypeScript du domaine (recette, auteur...)
 docs/             documentation du projet (cahier des charges)
 scripts/          scripts d'administration (gestion de la liste blanche)
