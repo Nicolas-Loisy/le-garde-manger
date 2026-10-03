@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createRecipe, updateRecipe } from "@/lib/recipes";
+import type { ParsedRecipe } from "@/lib/ai";
+import { RecipeAutofill } from "./RecipeAutofill";
 import {
   CATEGORIES,
   DIFFICULTIES,
@@ -38,6 +40,24 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
   const [notes, setNotes] = useState(existing?.notes ?? "");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  function handleAutofill(parsed: ParsedRecipe) {
+    setTitle(parsed.title);
+    setCategory(parsed.category);
+    setCuisineType(parsed.cuisineType ?? "");
+    setIngredients(
+      parsed.ingredients.length > 0
+        ? parsed.ingredients
+        : [{ name: "", quantity: null, unit: null }]
+    );
+    setSteps(parsed.steps.length > 0 ? parsed.steps : [""]);
+    setPrepMinutes(parsed.prepMinutes);
+    setCookMinutes(parsed.cookMinutes);
+    setRestMinutes(parsed.restMinutes);
+    setDifficulty(parsed.difficulty);
+    setServings(parsed.servings);
+    setTags(parsed.tags.join(", "));
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -84,7 +104,9 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="notebook-card p-4 sm:p-6 flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
+      {!existing && <RecipeAutofill onParsed={handleAutofill} />}
+      <form onSubmit={handleSubmit} className="notebook-card p-4 sm:p-6 flex flex-col gap-5">
       <div>
         <label className="block mb-1">Titre</label>
         <input
@@ -307,6 +329,7 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
       <button type="submit" disabled={submitting} className="btn-primary self-start">
         {submitting ? "Enregistrement..." : existing ? "Mettre à jour" : "Ajouter la recette"}
       </button>
-    </form>
+      </form>
+    </div>
   );
 }

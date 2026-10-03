@@ -25,7 +25,7 @@ function getFirebaseApp(): FirebaseApp | null {
   return initializeApp(firebaseConfig);
 }
 
-const app = getFirebaseApp();
+export const app = getFirebaseApp();
 
 export const auth = (app ? getAuth(app) : null) as Auth;
 export const db = (app ? getFirestore(app) : null) as Firestore;
