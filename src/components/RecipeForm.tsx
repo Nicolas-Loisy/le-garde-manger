@@ -72,7 +72,6 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
         authorId: user.uid,
         authorName: authorName.trim() || user.displayName || user.email || "Anonyme",
         category,
-        cuisineType: cuisineType || undefined,
         ingredients: ingredients.filter((i) => i.name.trim() !== ""),
         steps: steps.filter((s) => s.trim() !== ""),
         prepMinutes,
@@ -84,7 +83,10 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
           .split(",")
           .map((t) => t.trim())
           .filter(Boolean),
-        notes: notes || undefined,
+        // Firestore refuse `undefined` comme valeur de champ : on omet la clé
+        // entièrement plutôt que de lui donner une valeur vide.
+        ...(cuisineType.trim() ? { cuisineType: cuisineType.trim() } : {}),
+        ...(notes.trim() ? { notes: notes.trim() } : {}),
       };
 
       let id: string;
