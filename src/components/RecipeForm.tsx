@@ -98,12 +98,12 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
         id = await createRecipe(payload);
       }
 
-      // Garde la collection "authors" synchronisée avec le compte (pas le
-      // champ Auteur en texte libre, qui peut changer d'une recette à
-      // l'autre) : c'est ce qui alimente le filtre et la page par auteur.
+      // Garde la collection "authors" synchronisée avec le nom renseigné
+      // dans le champ Auteur de la recette : c'est ce qui alimente le
+      // filtre et la page par auteur.
       await upsertAuthor({
         id: user.uid,
-        name: user.displayName || user.email || "Anonyme",
+        name: payload.authorName,
       });
 
       router.push(`/recipes/${id}`);
