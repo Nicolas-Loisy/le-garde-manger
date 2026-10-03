@@ -20,7 +20,7 @@ export function PrintableRecipe({ recipe }: { recipe: Recipe }) {
       <p className="text-cocoa/80 mt-2">
         Par{" "}
         <Link
-          href={`/recipes/author/${recipe.authorId}`}
+          href={`/recipes/author/${encodeURIComponent(recipe.authorName)}`}
           className="hover:text-rust no-print"
         >
           {recipe.authorName}

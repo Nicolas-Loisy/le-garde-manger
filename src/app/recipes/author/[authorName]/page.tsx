@@ -5,28 +5,23 @@ import { useParams } from "next/navigation";
 import { AuthGuard } from "@/components/AuthGuard";
 import { RecipeCard } from "@/components/RecipeCard";
 import { listRecipesByAuthor } from "@/lib/recipes";
-import { getAuthor } from "@/lib/authors";
-import type { Author, Recipe } from "@/types/recipe";
+import type { Recipe } from "@/types/recipe";
 
 function AuthorContent() {
-  const params = useParams<{ authorId: string }>();
-  const [author, setAuthor] = useState<Author | null>(null);
+  const params = useParams<{ authorName: string }>();
+  const authorName = decodeURIComponent(params.authorName);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([getAuthor(params.authorId), listRecipesByAuthor(params.authorId)])
-      .then(([a, r]) => {
-        setAuthor(a);
-        setRecipes(r);
-      })
+    listRecipesByAuthor(authorName)
+      .then(setRecipes)
       .finally(() => setLoading(false));
-  }, [params.authorId]);
+  }, [authorName]);
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-4xl">{author?.name ?? "Auteur"}</h1>
-      {author?.bio && <p className="text-cocoa/80 italic">{author.bio}</p>}
+      <h1 className="text-4xl">{authorName}</h1>
       {loading ? (
         <p className="text-cocoa/70">Chargement...</p>
       ) : recipes.length === 0 ? (

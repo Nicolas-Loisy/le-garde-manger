@@ -8,13 +8,6 @@ export interface Ingredient {
   unit: string | null;
 }
 
-export interface Author {
-  id: string;
-  name: string;
-  bio?: string;
-  avatarUrl?: string;
-}
-
 export interface Recipe {
   id: string;
   title: string;

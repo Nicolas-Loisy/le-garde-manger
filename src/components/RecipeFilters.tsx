@@ -1,28 +1,27 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Author, Category, Difficulty, Recipe } from "@/types/recipe";
+import type { Category, Difficulty, Recipe } from "@/types/recipe";
 import { CATEGORIES, DIFFICULTIES } from "@/types/recipe";
 import { RecipeCard } from "./RecipeCard";
 
 type SortKey = "date" | "alpha" | "prepTime";
 
-export function RecipeFilters({
-  recipes,
-  authors,
-}: {
-  recipes: Recipe[];
-  authors: Author[];
-}) {
+export function RecipeFilters({ recipes }: { recipes: Recipe[] }) {
   const [keyword, setKeyword] = useState("");
   const [category, setCategory] = useState<Category | "">("");
-  const [authorId, setAuthorId] = useState("");
+  const [authorName, setAuthorName] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty | "">("");
   const [tag, setTag] = useState("");
   const [sort, setSort] = useState<SortKey>("date");
 
   const allTags = useMemo(
     () => Array.from(new Set(recipes.flatMap((r) => r.tags))).sort(),
+    [recipes]
+  );
+
+  const allAuthors = useMemo(
+    () => Array.from(new Set(recipes.map((r) => r.authorName))).sort(),
     [recipes]
   );
 
@@ -35,7 +34,7 @@ export function RecipeFilters({
           i.name.toLowerCase().includes(keyword.toLowerCase())
         );
       const matchesCategory = !category || r.category === category;
-      const matchesAuthor = !authorId || r.authorId === authorId;
+      const matchesAuthor = !authorName || r.authorName === authorName;
       const matchesDifficulty = !difficulty || r.difficulty === difficulty;
       const matchesTag = !tag || r.tags.includes(tag);
       return (
@@ -55,7 +54,7 @@ export function RecipeFilters({
     });
 
     return result;
-  }, [recipes, keyword, category, authorId, difficulty, tag, sort]);
+  }, [recipes, keyword, category, authorName, difficulty, tag, sort]);
 
   return (
     <div className="flex flex-col gap-6">
@@ -81,14 +80,14 @@ export function RecipeFilters({
             ))}
           </select>
           <select
-            value={authorId}
-            onChange={(e) => setAuthorId(e.target.value)}
+            value={authorName}
+            onChange={(e) => setAuthorName(e.target.value)}
             className="bg-paper border border-cocoa/30 rounded-sm px-2 py-1"
           >
             <option value="">Tous les auteurs</option>
-            {authors.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.name}
+            {allAuthors.map((name) => (
+              <option key={name} value={name}>
+                {name}
               </option>
             ))}
           </select>

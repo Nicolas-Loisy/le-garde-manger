@@ -30,12 +30,6 @@ service cloud.firestore {
       allow create, update, delete: if isAllowedEmail();
     }
 
-    // Auteurs : lecture réservée aux emails autorisés, écriture idem.
-    match /authors/{authorId} {
-      allow read: if isAllowedEmail();
-      allow write: if isAllowedEmail();
-    }
-
     // Compteur quotidien du remplissage automatique par IA (un document par
     // jour, ex. "2026-10-03"). Limite coopérative contre l'emballement des
     // coûts de l'API Claude, pas une barrière de sécurité stricte.

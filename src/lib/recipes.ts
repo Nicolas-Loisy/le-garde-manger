@@ -62,10 +62,10 @@ export async function listRecipesByCategory(
   return snap.docs.map(toRecipe);
 }
 
-export async function listRecipesByAuthor(authorId: string): Promise<Recipe[]> {
+export async function listRecipesByAuthor(authorName: string): Promise<Recipe[]> {
   const q = query(
     collection(db, RECIPES_COLLECTION),
-    where("authorId", "==", authorId),
+    where("authorName", "==", authorName),
     orderBy("createdAt", "desc")
   );
   const snap = await getDocs(q);

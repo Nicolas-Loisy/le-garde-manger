@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { createRecipe, updateRecipe } from "@/lib/recipes";
-import { upsertAuthor } from "@/lib/authors";
 import type { ParsedRecipe } from "@/lib/ai";
 import { RecipeAutofill } from "./RecipeAutofill";
 import {
@@ -97,14 +96,6 @@ export function RecipeForm({ existing }: { existing?: Recipe }) {
       } else {
         id = await createRecipe(payload);
       }
-
-      // Garde la collection "authors" synchronisée avec le nom renseigné
-      // dans le champ Auteur de la recette : c'est ce qui alimente le
-      // filtre et la page par auteur.
-      await upsertAuthor({
-        id: user.uid,
-        name: payload.authorName,
-      });
 
       router.push(`/recipes/${id}`);
     } catch (err) {
