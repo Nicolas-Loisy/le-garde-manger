@@ -29,9 +29,10 @@ function getFirebaseApp(): FirebaseApp | null {
 
 /**
  * App Check protège l'API Gemini (Firebase AI Logic) : sans token d'attestation
- * valide, les appels sont rejetés (401). En local, le jeton de débogage
- * remplace reCAPTCHA Enterprise / Fraud Defense (voir README, section IA,
- * pour l'enregistrer une fois côté console Firebase).
+ * valide, les appels sont rejetés (401). Le vrai flux reCAPTCHA Enterprise /
+ * Fraud Defense s'exécute silencieusement (aucune interaction utilisateur),
+ * y compris sur localhost tant que ce domaine est autorisé pour la clé
+ * (voir README, section IA).
  *
  * Appelée à chaque évaluation du module (y compris après un rechargement à
  * chaud en dev, où une app Firebase déjà enregistrée peut être réutilisée) :
@@ -41,11 +42,6 @@ function getFirebaseApp(): FirebaseApp | null {
 function initAppCheck(app: FirebaseApp): void {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
   if (!siteKey) return;
-
-  if (process.env.NODE_ENV !== "production") {
-    (self as unknown as { FIREBASE_APPCHECK_DEBUG_TOKEN?: boolean }).FIREBASE_APPCHECK_DEBUG_TOKEN =
-      true;
-  }
 
   try {
     initializeAppCheck(app, {
