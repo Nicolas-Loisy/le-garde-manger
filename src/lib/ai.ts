@@ -77,7 +77,7 @@ function getModel(): GenerativeModel {
   }
   const ai = getAI(app, { backend: new GoogleAIBackend() });
   return getGenerativeModel(ai, {
-    model: "gemini-2.5-flash",
+    model: "gemini-3.7-flash",
     generationConfig: {
       responseMimeType: "application/json",
       responseSchema: recipeSchema,
