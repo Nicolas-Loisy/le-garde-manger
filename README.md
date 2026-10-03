@@ -71,8 +71,9 @@ Le formulaire d'ajout de recette propose de coller un texte (recette copiée d'u
 Cette API est protégée par **App Check**, qui exige un jeton d'attestation valide pour chaque appel (sinon erreur 401). Mise en place, une seule fois :
 
 1. **Activer l'API** : Console Firebase → *Build* → *AI Logic* → *Get started* → choisir **Gemini Developer API** (pas "Vertex AI Gemini API", qui demande Blaze).
-2. **Créer une clé reCAPTCHA v3** (gratuite) sur [google.com/recaptcha/admin](https://www.google.com/recaptcha/admin) : type "reCAPTCHA v3", domaines `localhost` et votre domaine de production (ex. `xxx.vercel.app`). Copiez la **clé de site** dans `.env.local` → `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`.
-3. **Enregistrer App Check** : Console Firebase → *App Check* → onglet *Apps* → votre app Web → *Enregistrer* → fournisseur **reCAPTCHA v3** → collez la même clé de site.
+2. **Créer une clé Fraud Defense / reCAPTCHA Enterprise** (gratuite) : Google Cloud Console → *Security* → *Fraud Defense* (anciennement reCAPTCHA Enterprise) → créer une clé type *Score-based* (site web), domaines `localhost` et votre domaine de production (ex. `xxx.vercel.app`). Copiez le **Key ID** dans `.env.local` → `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`.
+   ⚠️ Ce n'est pas la même clé que celle du reCAPTCHA v3 "classique" (`google.com/recaptcha/admin`) — Fraud Defense a son propre tableau de clés, dans le même projet Google Cloud que Firebase.
+3. **Enregistrer App Check** : Console Firebase → *App Check* → onglet *Apps* → votre app Web → *Enregistrer* → fournisseur **reCAPTCHA Enterprise** → collez le même Key ID.
 4. **Jeton de débogage (local uniquement)** : lancez `npm run dev`, ouvrez la console du navigateur (F12), copiez la ligne `App Check debug token: xxxx-xxxx-...` qui s'affiche. Console Firebase → *App Check* → *Apps* → votre app Web → menu ⋮ → *Gérer les jetons de débogage* → *Ajouter un jeton de débogage* → collez-le.
 
 Sans `NEXT_PUBLIC_RECAPTCHA_SITE_KEY`, App Check n'est pas initialisé et le reste du site fonctionne normalement — seul le remplissage automatique est indisponible.

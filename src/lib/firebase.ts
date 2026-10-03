@@ -1,5 +1,5 @@
 import { initializeApp, getApps, type FirebaseApp } from "firebase/app";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
+import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "firebase/app-check";
 import { getAuth, type Auth } from "firebase/auth";
 import { getFirestore, type Firestore } from "firebase/firestore";
 
@@ -31,8 +31,8 @@ function getFirebaseApp(): FirebaseApp | null {
 /**
  * App Check protège l'API Gemini (Firebase AI Logic) : sans token d'attestation
  * valide, les appels sont rejetés (401). En local, le jeton de débogage
- * remplace reCAPTCHA (voir README, section IA, pour l'enregistrer une fois
- * côté console Firebase).
+ * remplace reCAPTCHA Enterprise / Fraud Defense (voir README, section IA,
+ * pour l'enregistrer une fois côté console Firebase).
  */
 function initAppCheck(app: FirebaseApp): void {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -44,7 +44,7 @@ function initAppCheck(app: FirebaseApp): void {
   }
 
   initializeAppCheck(app, {
-    provider: new ReCaptchaV3Provider(siteKey),
+    provider: new ReCaptchaEnterpriseProvider(siteKey),
     isTokenAutoRefreshEnabled: true,
   });
 }
