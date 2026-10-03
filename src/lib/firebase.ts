@@ -22,10 +22,9 @@ const firebaseConfig = {
 function getFirebaseApp(): FirebaseApp | null {
   if (typeof window === "undefined") return null;
   const apps = getApps();
-  if (apps.length > 0) return apps[0];
-  const newApp = initializeApp(firebaseConfig);
-  initAppCheck(newApp);
-  return newApp;
+  const firebaseApp = apps.length > 0 ? apps[0] : initializeApp(firebaseConfig);
+  initAppCheck(firebaseApp);
+  return firebaseApp;
 }
 
 /**
@@ -33,6 +32,11 @@ function getFirebaseApp(): FirebaseApp | null {
  * valide, les appels sont rejetés (401). En local, le jeton de débogage
  * remplace reCAPTCHA Enterprise / Fraud Defense (voir README, section IA,
  * pour l'enregistrer une fois côté console Firebase).
+ *
+ * Appelée à chaque évaluation du module (y compris après un rechargement à
+ * chaud en dev, où une app Firebase déjà enregistrée peut être réutilisée) :
+ * initializeAppCheck() lève si elle a déjà été appelée pour cette app, d'où
+ * le try/catch — on ignore alors l'erreur plutôt que de planter le rendu.
  */
 function initAppCheck(app: FirebaseApp): void {
   const siteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
@@ -43,10 +47,14 @@ function initAppCheck(app: FirebaseApp): void {
       true;
   }
 
-  initializeAppCheck(app, {
-    provider: new ReCaptchaEnterpriseProvider(siteKey),
-    isTokenAutoRefreshEnabled: true,
-  });
+  try {
+    initializeAppCheck(app, {
+      provider: new ReCaptchaEnterpriseProvider(siteKey),
+      isTokenAutoRefreshEnabled: true,
+    });
+  } catch {
+    // Déjà initialisée pour cette app (ex. re-render à chaud) : rien à faire.
+  }
 }
 
 export const app = getFirebaseApp();
