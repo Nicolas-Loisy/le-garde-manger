@@ -8,11 +8,13 @@ interface SpeechRecognitionResultLike {
 }
 
 interface SpeechRecognitionEventLike {
+  resultIndex: number;
   results: ArrayLike<ArrayLike<SpeechRecognitionResultLike>>;
 }
 
 interface MinimalSpeechRecognition {
   lang: string;
+  continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
   start: () => void;
@@ -76,11 +78,17 @@ export function RecipeAutofill({
     setError(null);
     const recognition = new SpeechRecognitionCtor();
     recognition.lang = "fr-FR";
+    recognition.continuous = true;
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      setText((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      let addition = "";
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        addition += (addition ? " " : "") + event.results[i][0].transcript;
+      }
+      if (addition) {
+        setText((prev) => (prev ? `${prev} ${addition}` : addition));
+      }
     };
     recognition.onerror = () => {
       setError("Erreur pendant la dictée. Réessaie.");
